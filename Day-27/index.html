@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InventoryPro Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#dashboard"><span class="brand-mark">IP</span><span>Inventory<span class="brand-light">Pro</span></span></a>
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="side-nav" id="sideNav">
+        <a href="#dashboard" data-section="dashboard" class="nav-link active">▦ <span>Dashboard</span></a>
+        <a href="#products" data-section="products" class="nav-link">▣ <span>Products</span></a>
+        <a href="#categories" data-section="categories" class="nav-link">▤ <span>Categories</span></a>
+        <a href="#suppliers" data-section="suppliers" class="nav-link admin-only">♧ <span>Suppliers</span></a>
+        <a href="#sales" data-section="sales" class="nav-link">＄ <span>Sales</span></a>
+        <a href="#stock" data-section="stock" class="nav-link">⇅ <span>Stock Movement History</span></a>
+        <a href="#notifications" data-section="notifications" class="nav-link">♢ <span>Notifications <b id="navUnread" class="nav-count">0</b></span></a>
+        <a href="#activity" data-section="activity" class="nav-link admin-only">◷ <span>Activity Log</span></a>
+        <a href="#backup" data-section="backup" class="nav-link admin-only">⇧ <span>Backup &amp; Restore</span></a>
+        <a href="reports.html" class="nav-link admin-only">▥ <span>Reports & Export</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-user"><div class="avatar" id="userAvatar">A</div><div><strong id="sidebarUser">Admin</strong><small id="sidebarRole">Administrator</small></div></div>
+        <button id="logoutBtn" class="btn btn-light btn-full">↪ Log out</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><p class="eyebrow">INVENTORY WORKSPACE</p><h1 id="pageTitle">Dashboard</h1></div>
+        <div class="topbar-actions">
+          <button class="icon-button" id="notificationShortcut" title="Notifications">♢ <span id="topUnread" class="notification-dot">0</span></button>
+          <div class="topbar-date" id="todayLabel"></div>
+        </div>
+      </header>
+
+      <section id="dashboard" class="app-section">
+        <div class="dashboard-toolbar">
+          <div><p class="eyebrow">LIVE OVERVIEW</p><h2>Inventory Dashboard</h2><p class="muted">A clear view of your stock and inventory value.</p></div>
+          <div class="chart-filters">
+            <label class="filter-field">Category<select id="chartCategory"><option value="all">All Categories</option></select></label>
+            <button type="button" class="btn btn-light" id="clearChartFilters">Clear Filters</button>
+            <button type="button" class="btn btn-primary" id="refreshCharts">Refresh</button>
+          </div>
+        </div>
+        <div class="stat-grid chart-stat-grid">
+          <article class="stat-card"><span>Total Products</span><h2 id="chartTotalProducts">0</h2><small>Products in selection</small><span class="stat-icon purple">▣</span></article>
+          <article class="stat-card"><span>Total Stock Quantity</span><h2 id="chartTotalStock">0</h2><small>Available units</small><span class="stat-icon blue">⇅</span></article>
+          <article class="stat-card"><span>Low-Stock Products</span><h2 id="chartLowStock">0</h2><small>Below minimum level</small><span class="stat-icon amber">!</span></article>
+          <article class="stat-card"><span>Out-of-Stock Products</span><h2 id="chartOutOfStock">0</h2><small>Zero units remaining</small><span class="stat-icon red">×</span></article>
+          <article class="stat-card"><span>Total Inventory Value</span><h2 id="chartInventoryValue">₹0</h2><small>Price × stock quantity</small><span class="stat-icon green">₹</span></article>
+        </div>
+        <div class="charts-grid">
+          <article class="panel chart-panel"><div class="chart-heading"><div><h3>Stock Status</h3><p class="muted">Products grouped by stock condition</p></div></div><div class="chart-canvas-wrap doughnut-wrap"><canvas id="stockStatusChart"></canvas></div></article>
+          <article class="panel chart-panel"><div class="chart-heading"><div><h3>Category-Wise Products</h3><p class="muted">Number of products in each category</p></div></div><div class="chart-canvas-wrap"><canvas id="categoryProductsChart"></canvas></div></article>
+          <article class="panel chart-panel"><div class="chart-heading"><div><h3>Inventory Value by Category</h3><p class="muted">Price multiplied by current stock</p></div></div><div class="chart-canvas-wrap"><canvas id="inventoryValueChart"></canvas></div></article>
+          <article class="panel chart-panel"><div class="chart-heading"><div><h3>Stock Quantity by Product</h3><p class="muted">Current units for each product</p></div></div><div class="chart-canvas-wrap"><canvas id="productStockChart"></canvas></div></article>
+        </div>
+        <article class="panel"><div class="section-heading"><div><h2>Inventory Details</h2><p class="muted">Product details for the selected category.</p></div><a href="#products" class="text-link">Manage products →</a></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead><tbody id="dashboardTable"></tbody></table></div></article>
+      </section>
+
+      <section id="products" class="app-section">
+        <div class="section-heading"><div><h2>Products</h2><p class="muted">Add, edit, and maintain your inventory items.</p></div></div>
+        <div class="two-column">
+          <article class="panel"><h3 id="productFormTitle">Add Product</h3><form id="productForm" class="form-grid">
+            <input type="hidden" id="productId">
+            <label>Product name<input id="productName" required minlength="2" placeholder="e.g. Wireless Mouse"></label>
+            <label>Category<select id="productCategory" required></select></label>
+            <label>Selling price (₹)<input id="productPrice" type="number" min="0.01" step="0.01" required></label>
+            <label>Stock quantity<input id="productStock" type="number" min="0" step="1" required></label>
+            <label>Minimum stock level<input id="productMinimum" type="number" min="0" step="1" value="10" required></label>
+            <label>Supplier<select id="productSupplier"><option value="">No supplier</option></select></label>
+            <label class="span-2">Description<textarea id="productDescription" rows="2" placeholder="Product details (optional)"></textarea></label>
+            <div class="form-actions span-2"><button class="btn btn-primary" type="submit">Save Product</button><button class="btn btn-light" type="button" id="cancelProductEdit">Clear</button></div>
+          </form></article>
+          <article class="panel"><div class="section-heading"><div><h3>Inventory Snapshot</h3><p class="muted">Quick product health overview.</p></div></div><div class="mini-stat-list"><div><span>Total product records</span><strong id="productCount">0</strong></div><div><span>Low-stock items</span><strong id="productLowCount">0</strong></div><div><span>Out of stock</span><strong id="productOutCount">0</strong></div></div><p class="hint">Low stock means quantity is below the product's minimum stock level.</p></article>
+        </div>
+        <article class="panel"><div class="table-toolbar"><input id="productSearch" placeholder="Search products..." type="search"><select id="productStatusFilter"><option value="all">All stock statuses</option><option>In Stock</option><option>Low Stock</option><option>Out of Stock</option></select></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Product</th><th>Category</th><th>Supplier</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead><tbody id="productsTable"></tbody></table></div></article>
+      </section>
+
+      <section id="categories" class="app-section">
+        <div class="section-heading"><div><h2>Categories</h2><p class="muted">Organize products into clear groups.</p></div></div>
+        <article class="panel"><form id="categoryForm" class="inline-form"><input type="hidden" id="categoryId"><label>Category name<input id="categoryName" required placeholder="e.g. Electronics"></label><label>Description<input id="categoryDescription" placeholder="Optional description"></label><button class="btn btn-primary" type="submit">Save Category</button><button class="btn btn-light" type="button" id="cancelCategoryEdit">Clear</button></form></article>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Category</th><th>Description</th><th>Products</th><th>Actions</th></tr></thead><tbody id="categoriesTable"></tbody></table></div></article>
+      </section>
+
+      <section id="suppliers" class="app-section admin-only-section">
+        <div class="section-heading"><div><h2>Suppliers</h2><p class="muted">Maintain supplier contact information.</p></div></div>
+        <article class="panel"><form id="supplierForm" class="form-grid"><input type="hidden" id="supplierId"><label>Supplier name<input id="supplierName" required></label><label>Company<input id="supplierCompany"></label><label>Phone<input id="supplierPhone" type="tel"></label><label>Email<input id="supplierEmail" type="email"></label><label class="span-2">Address<textarea id="supplierAddress" rows="2"></textarea></label><div class="form-actions span-2"><button class="btn btn-primary" type="submit">Save Supplier</button><button class="btn btn-light" type="button" id="cancelSupplierEdit">Clear</button></div></form></article>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Company</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead><tbody id="suppliersTable"></tbody></table></div></article>
+      </section>
+
+      <section id="sales" class="app-section">
+        <div class="section-heading"><div><h2>Sales</h2><p class="muted">Record a sale and automatically reduce stock.</p></div></div>
+        <article class="panel"><form id="saleForm" class="form-grid"><label>Customer name<input id="saleCustomer" required></label><label>Customer phone<input id="salePhone" type="tel"></label><label>Product<select id="saleProduct" required></select></label><label>Quantity<input id="saleQuantity" type="number" min="1" step="1" value="1" required></label><label>Discount (₹)<input id="saleDiscount" type="number" min="0" step="0.01" value="0"></label><label>Sale date<input id="saleDate" type="date" required></label><label>Total (₹)<input id="saleTotal" readonly value="0.00"></label><div class="form-actions"><button class="btn btn-primary" type="submit">Complete Sale</button></div></form></article>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Customer</th><th>Product</th><th>Quantity</th><th>Date</th><th>Total</th></tr></thead><tbody id="salesTable"></tbody></table></div></article>
+      </section>
+
+      <section id="stock" class="app-section">
+        <div class="section-heading"><div><h2>Stock Movement History</h2><p class="muted">Track every stock addition, removal, adjustment, and sale-related reduction.</p></div></div>
+        <div class="stats-grid movement-summary-grid">
+          <article class="stat-card"><span>Total Stock Movements</span><h2 id="movementTotal">0</h2><small>Recorded changes</small><span class="stat-icon blue">↕</span></article>
+          <article class="stat-card"><span>Total Units Added</span><h2 id="movementAdded">0</h2><small>Actual increases</small><span class="stat-icon green">＋</span></article>
+          <article class="stat-card"><span>Total Units Removed</span><h2 id="movementRemoved">0</h2><small>Actual decreases</small><span class="stat-icon red">−</span></article>
+          <article class="stat-card"><span>Out-of-Stock Products</span><h2 id="movementOutOfStock">0</h2><small>Currently at zero</small><span class="stat-icon amber">!</span></article>
+        </div>
+        <article class="panel"><div class="section-heading"><div><h3>Record a Stock Change</h3><p class="muted">Stock changes are saved with the date, time, and reason.</p></div></div>
+          <form id="stockForm" class="form-grid"><label>Product<select id="movementProduct" required></select></label><label>Movement type<select id="movementType"><option value="in">Stock Added</option><option value="out">Stock Removed</option><option value="adjustment">Stock Adjustment</option></select></label><label>Quantity<input id="movementQuantity" type="number" min="1" step="1" required></label><label>Reason<input id="movementReason" placeholder="New stock received, damage, correction..." required></label><div class="form-actions"><button class="btn btn-primary" type="submit">Save Movement</button></div></form>
+        </article>
+        <article class="panel"><div class="section-heading"><div><h3>Movement Records</h3><p class="muted"><span id="movementMatchCount">0</span> matching records</p></div></div>
+          <div class="movement-filter-grid">
+            <label>Search product<input id="movementSearch" type="search" placeholder="Product name or product ID"></label>
+            <label>Movement type<select id="movementTypeFilter"><option value="all">All movement types</option><option value="Stock Added">Stock Added</option><option value="Stock Removed">Stock Removed</option><option value="Stock Adjustment">Stock Adjustment</option><option value="Sale-Related Stock Reduction">Sale-Related Stock Reduction</option></select></label>
+            <label>From date<input id="movementDateFrom" type="date"></label><label>To date<input id="movementDateTo" type="date"></label>
+            <div class="movement-filter-action"><button type="button" class="btn btn-light" id="clearMovementFilters">Clear Filters</button></div>
+          </div>
+          <div class="table-wrap"><table class="movement-history-table"><thead><tr><th>Movement ID</th><th>Product ID</th><th>Product Name</th><th>Movement Type</th><th>Previous Stock</th><th>Quantity Changed</th><th>New Stock</th><th>Reason</th><th>Date &amp; Time</th></tr></thead><tbody id="movementsTable"></tbody></table></div>
+        </article>
+      </section>
+
+      <section id="notifications" class="app-section">
+        <div class="section-heading"><div><h2>Notifications</h2><p class="muted">Product, stock, and sales alerts.</p></div><button id="markAllRead" class="btn btn-light">Mark all read</button></div>
+        <div id="notificationsList" class="notification-list"></div>
+      </section>
+
+      <section id="activity" class="app-section admin-only-section">
+        <div class="section-heading"><div><h2>Activity Log</h2><p class="muted">Recent changes made in this browser.</p></div><button id="clearActivity" class="btn btn-light">Clear log</button></div>
+        <article class="panel"><div class="table-wrap"><table><thead><tr><th>Date & Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="activityTable"></tbody></table></div></article>
+      </section>
+
+      <section id="backup" class="app-section admin-only-section">
+        <div class="section-heading"><div><h2>Backup &amp; Restore</h2><p class="muted">Download a safe JSON snapshot or restore a previous inventory backup.</p></div></div>
+        <div class="backup-notice"><strong>Before restoring:</strong> Restoring replaces current inventory data. The file is fully validated before saved inventory data is changed. Choose a trusted JSON backup only.</div>
+        <div class="backup-action-grid">
+          <article class="panel backup-action-card"><div class="backup-card-icon">↓</div><h3>Download Inventory Backup</h3><p class="muted">Save products, categories, suppliers, sales, stock movements, activity logs, and notifications as a JSON file.</p><button type="button" class="btn btn-primary" id="downloadBackupBtn">Download Backup</button></article>
+          <article class="panel backup-action-card"><div class="backup-card-icon restore-icon">↑</div><h3>Restore from Backup</h3><p class="muted">Select an InventoryPro JSON file. Invalid or unsupported files will not replace your current data.</p><label class="backup-file-label">Choose backup JSON file<input type="file" id="restoreBackupFile" accept=".json,application/json"></label><p id="restoreBackupStatus" class="backup-status" aria-live="polite">No file selected.</p><button type="button" class="btn btn-light" id="restoreBackupBtn" disabled>Validate &amp; Restore Backup</button></article>
+        </div>
+        <article class="panel"><div class="section-heading"><div><h2>Backup History</h2><p class="muted">History metadata is saved in this browser. Downloaded JSON files are not stored by the app.</p></div><button type="button" class="btn btn-light" id="refreshBackupHistory">Refresh History</button></div><div class="table-wrap"><table><thead><tr><th>Backup ID</th><th>Filename</th><th>Date &amp; Time</th><th>Status</th><th>Action</th></tr></thead><tbody id="backupHistoryTable"></tbody></table></div></article>
+      </section>
+    </main>
+  </div>
+
+
+  
+
+  
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/activityLog.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/stockMovementHistory.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/suppliers.js"></script>
+  <script src="js/sales.js"></script>
+  <script src="js/stockManagement.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/backup.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | InventoryPro</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+  <main class="login-card">
+    <div class="brand-mark">IP</div>
+    <p class="eyebrow">INVENTORY MANAGEMENT</p>
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in to manage your inventory.</p>
+    <form id="loginForm" class="form-stack">
+      <label>Email address<input id="loginEmail" type="email" placeholder="admin@demo.com" required></label>
+      <label>Password<div class="password-wrap"><input id="loginPassword" type="password" placeholder="Enter password" required><button type="button" class="password-toggle" id="togglePassword">Show</button></div></label>
+      <p id="loginError" class="form-error" role="alert"></p>
+      <button class="btn btn-primary btn-full" type="submit">Sign In</button>
+    </form>
+    <div class="demo-box">
+      <strong>Demo accounts</strong>
+      <p>Admin: <code>admin@demo.com</code> / <code>admin123</code></p>
+      <p>Staff: <code>staff@demo.com</code> / <code>staff123</code></p>
+    </div>
+  </main>
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => Auth.initLogin());
+  </script>
+</body>
+</html>

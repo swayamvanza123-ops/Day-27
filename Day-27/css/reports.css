@@ -1,0 +1,4 @@
+/* Reports page supplements the shared style.css */
+.reports-intro{margin-bottom:22px}
+.report-number{font-size:24px;font-weight:800;margin:12px 0;color:#292a45}
+.export-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
